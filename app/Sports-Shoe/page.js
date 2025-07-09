@@ -1,11 +1,23 @@
-import React from 'react'
+"use client"
+import React,{useEffect, useState} from 'react'
 import Link from 'next/link'
 
-const Sports = async () => {
-  const res = await fetch(`${process.env.NEXTAUTH_URL}/api/products?category=Sports Shoe`, {
-    cache: 'no-store',
-  })
-  const products = await res.json()
+const Sports =  () => {
+
+  const [products, setproducts] = useState({})
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      const res = await fetch(`${process.env.NEXTAUTH_URL}/api/products?category=Sports Shoe`, {
+        cache: 'no-store',
+      })
+      const data = await res.json()
+      setproducts(data)
+      console.log(data)
+      
+    }
+    fetchProducts()
+  }, [])
 
 
   return (
