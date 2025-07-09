@@ -1,0 +1,223 @@
+/* eslint-disable @next/next/no-img-element */
+'use client'
+
+import React, { useContext, useState, useEffect } from 'react'
+import { useParams } from 'next/navigation';
+import { FaShoppingBag } from "react-icons/fa";
+import { CartContext } from '../../cartContext.js';
+import Loader from '@/app/Components/Loader/page.js';
+import { redirect } from 'next/navigation';
+
+
+const Page = () => {
+  const params = useParams();
+  const ProductName = decodeURIComponent(params.slug);
+  const [product, setProduct] = useState(null);
+  const [variants, setVariants] = useState([]);
+  const [availableSizes, setAvailableSizes] = useState([]);
+  const [productImage, setProductImage] = useState('');
+  const { cart, setcart } = useContext(CartContext);
+  const { cartDot, setcartDot } = useContext(CartContext);
+  const { subtotal, setsubtotal } = useContext(CartContext);
+
+  const [size, setsize] = useState('')
+
+  useEffect(() => {
+    async function fetchProduct() {
+      const res = await fetch(`/api/product?title=${encodeURIComponent(ProductName)}`)
+      const data = await res.json();
+      const firstKey = Object.keys(data)[0];
+      const productData = data[firstKey];
+      if (data) {
+        setProduct(productData);
+      } else {
+        console.error('Product not found');
+      }
+    }
+    fetchProduct();
+  }, [ProductName])
+
+  useEffect(() => {
+    if (availableSizes.length) {
+      const newSize = availableSizes.includes(size) ? size : availableSizes[0];
+     handleSize({ target: { value: newSize } });
+    }
+  }, [availableSizes]);
+
+
+  const [productColor, setproductColor] = useState(product ? product.color : '');
+
+  useEffect(() => {
+    if (!product?.title) return;
+
+    const fetchVariants = async () => {
+      const res = await fetch(`/api/getProductByTitle?title=${encodeURIComponent(product.title)}`);
+      const data = await res.json();
+      setVariants(data);
+
+      const defaultColor = data[0]?.color || '';
+      setproductColor(defaultColor);
+    };
+
+    fetchVariants();
+  }, [product]);
+
+  useEffect(() => {
+    if (!variants.length || !productColor) return;
+    console.log('Variants: ', variants);
+
+    const filteredSizes = variants
+      .filter(v => v.color === productColor && v.availableQty > 0)
+      .map(v => v.size);
+
+    const sortedSizes = [...filteredSizes].sort((a, b) => parseInt(a) - parseInt(b));
+
+    const variantImg = variants.find(v => v.color === productColor)?.img || '';
+    console.log('variantImg: ', variantImg);
+
+    setAvailableSizes(sortedSizes);
+    setProductImage(variantImg);
+  }, [productColor, variants]);
+
+
+
+
+  const saveCart = (mycart, cartDot, subtot) => {
+    localStorage.setItem('cart', JSON.stringify(mycart));
+    localStorage.setItem('cartDot', JSON.stringify(cartDot));
+    localStorage.setItem('subTotal', JSON.stringify(subtot));
+  };
+
+  const handleSize = (e) => {
+    console.log('Selected size: ', e.target.value);
+    setsize(e.target.value)
+  }
+
+  const handleColor = (e) => {
+    console.log('Selected color: ', e.target.value);
+    setproductColor(e.target.value)
+  }
+
+  const addTocart = (itemCode, qty, price, name, size, variant, category) => {
+
+    let myCart = { ...cart };
+    const numericQty = parseInt(qty);
+    const numericPrice = parseFloat(price);
+
+    let itemFound = false;
+    let addedPrice = numericPrice * numericQty;
+
+    for (const code in myCart) {
+      const item = myCart[code];
+
+      if (
+        item.name === name &&
+        item.size === size &&
+        item.variant === variant &&
+        item.unitPrice === numericPrice &&
+        item.slug === itemCode
+      ) {
+
+        item.qty += numericQty;
+        item.price = item.unitPrice * item.qty;
+        addedPrice = numericPrice * numericQty;
+        itemFound = true;
+        break;
+      }
+    }
+
+
+    if (!itemFound) {
+
+      const newCode = itemCode;
+      myCart[newCode] = {
+        qty: numericQty,
+        unitPrice: numericPrice,
+        price: numericPrice * numericQty,
+        name,
+        size,
+        variant,
+        category,
+      };
+    }
+
+    console.log('myCart: ', myCart);
+    const newSubtotal = subtotal + addedPrice;
+    const newCartDot = cartDot + numericQty;
+
+    setsubtotal(newSubtotal);
+    setcartDot(newCartDot);
+    setcart(myCart);
+    saveCart(myCart, newCartDot, newSubtotal);
+  };
+
+  const handleBuyNow = (itemcode, qty, price, name, size, variant, category) => {
+
+    addTocart(itemcode, qty, price, name, size, variant, category)
+    redirect('/Checkout');
+  }
+
+  const slugify = str =>
+    str
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, '-')
+      .replace(/[^a-z0-9-]/g, '')
+      .replace(/-+/g, '-');
+
+
+  if (!product) return <div className="text-center p-10">
+    <Loader />
+    </div>;
+  return (
+    <>
+      <section className="min-h-screen text-gray-600 body-font overflow-hidden">
+        <div className="container px-5 py-4 mx-auto">
+          <div className="lg:w-4/5 mx-auto justify-center items-center flex flex-wrap">
+            <img alt="ecommerce" className="lg:w-1/3 w-full lg:h-auto h-full p-6 object-contain object-center rounded" src={productImage || product.img} />
+            <div className="lg:w-1/2 object-center w-full lg:pl-10 lg:py-6 mt-6 lg:mt-0">
+              <h2 className="text-sm title-font text-gray-500 tracking-widest">{product.category}</h2>
+              <h1 className="text-gray-900 text-3xl title-font font-medium mb-1">{product.title}</h1>
+
+              <p className='leading-relaxed'>
+                {product.desc}
+              </p>
+              <div className="flex mt-6 items-center pb-5 border-b-2 border-gray-100 mb-5">
+                <div className="flex">
+                  <span className="mr-3">Color</span>
+
+                  {product.color.includes('White') && <button className="border-2 border-gray-300 rounded-full w-6 h-6 focus:ring-2 focus:ring-gray-300 focus:outline-none cursor-pointer" onClick={handleColor} value={"White"} ></button>}
+                  {product.color.includes('Blue') && <button className="border-2 focus:ring-2 focus:ring-gray-300 border-gray-300 ml-1 bg-blue-700 rounded-full w-6 h-6 focus:outline-none cursor-pointer" onClick={handleColor} value={"Blue"} ></button>}
+                  {product.color.includes('Red') && <button className="border-2 focus:ring-2 focus:ring-gray-300 border-gray-300 ml-1 bg-red-500 rounded-full w-6 h-6 focus:outline-none cursor-pointer" onClick={handleColor} value={"Red"} ></button>}
+                  {product.color.includes('Black') && <button className="border-2 focus:ring-2 focus:ring-gray-300 border-gray-300 ml-1 bg-black rounded-full w-6 h-6 focus:outline-none cursor-pointer" onClick={handleColor} value={"Black"} ></button>}
+                </div>
+                <div className="flex ml-6 items-center">
+                  <span className="mr-3">Size</span>
+                  <div className="relative">
+                    <select onChange={handleSize} value={size} className="rounded border appearance-none border-gray-300 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 text-base pl-3 pr-10">
+                      {availableSizes.map(sz => (
+                        <option key={sz} value={sz}>{sz}</option>
+                      ))}
+                    </select>
+                    <span className="absolute right-0 top-0 h-full w-10 text-center text-gray-600 pointer-events-none flex items-center justify-center">
+                      <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" className="w-4 h-4" viewBox="0 0 24 24">
+                        <path d="M6 9l6 6 6-6"></path>
+                      </svg>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div className="flex gap-3">
+                {product.availableQty > 0 ? <span className="title-font font-medium text-2xl text-gray-900">₹{product.price}</span> : <span className="title-font font-medium text-2xl text-gray-900">Currently unavailable!</span>}
+                <button disabled={product.availableQty <= 0} onClick={() => { const baseSlug = slugify(product.title); const fullSlug = `${baseSlug}-${size}-${productColor.toLowerCase()}`; handleBuyNow(fullSlug, 1, product.price, product.title, size, productColor, product.category) }} className="flex  text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded">Buy Now</button>
+                <button disabled={product.availableQty <= 0} onClick={() => { const baseSlug = slugify(product.title); const fullSlug = `${baseSlug}-${size}-${productColor.toLowerCase()}`; addTocart(fullSlug, 1, product.price, product.title, size, productColor, product.category) }} className="flex justify-center items-center gap-1.5 text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded"><FaShoppingBag />Add to Cart</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </>
+  )
+}
+
+export default Page
