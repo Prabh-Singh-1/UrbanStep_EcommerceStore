@@ -1,9 +1,10 @@
-import React, { useState } from 'react'
+"use client"
+import React from 'react'
 import { useContext } from 'react'
 import { CartContext } from '../../cartContext.js'
 
 const Page = () => {
-  const { cartDot, setcartDot } = useContext(CartContext)
+  const { cartDot } = useContext(CartContext)
 
   return (
 
