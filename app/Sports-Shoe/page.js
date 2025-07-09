@@ -19,6 +19,11 @@ const Sports =  () => {
     fetchProducts()
   }, [])
 
+  useEffect(() => {
+  console.log('Products updated:', products);
+  }, [products]);
+  
+
 
   return (
     <div>
