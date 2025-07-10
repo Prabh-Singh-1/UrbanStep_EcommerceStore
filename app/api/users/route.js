@@ -9,7 +9,7 @@ export async function GET() {
 }
 
 export async function POST(req) {
-  try {
+  try { 
     const body = await req.json()
     const pass = CryptoJS.AES.encrypt(body.password, `${process.env.CRYPTOJS_SECRET}`).toString()
 
