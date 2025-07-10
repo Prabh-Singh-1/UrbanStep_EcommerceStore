@@ -7,6 +7,7 @@ export async function GET(req) {
   const category = searchParams.get('category')
   
   console.log('Category:', category);
+  console.log('Fetching products with category:', category);
 
 
   const products = await prisma.product.findMany({
