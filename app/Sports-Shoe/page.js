@@ -8,7 +8,7 @@ const Sports =  () => {
 
   useEffect(() => {
     const fetchProducts = async () => {
-      const res = await fetch(`/api/products?category=`, {
+      const res = await fetch(`/api/products?category=Sports Shoe`, {
         cache: 'no-store',
       })
       const data = await res.json()
