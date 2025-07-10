@@ -7,7 +7,7 @@ export async function GET(req) {
 
   try {
     const Order = await prisma.order.findMany({
-      where: { orderId: title },
+      where: { orderid: title },
     });
 
     return NextResponse.json(Order, { status: 200 });

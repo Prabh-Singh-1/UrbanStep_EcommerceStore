@@ -105,7 +105,7 @@ const SignIn = () => {
 
             <button
               type="submit"
-              className="flex items-center justify-center gap-2 border w-full py-2 rounded-md hover:bg-gray-100 transition"
+              className="cursor-pointer flex items-center justify-center gap-2 border w-full py-2 rounded-md hover:bg-gray-100 transition"
             >
               Login
             </button>
@@ -113,7 +113,7 @@ const SignIn = () => {
             <button
               type="button"
               onClick={() => signIn("google", { callbackUrl: "/" })}
-              className="flex items-center justify-center gap-2 border w-full py-2 rounded-md hover:bg-gray-100 transition"
+              className="cursor-pointer flex items-center justify-center gap-2 border w-full py-2 rounded-md hover:bg-gray-100 transition"
             >
               <img
                 src="https://www.svgrepo.com/show/475656/google-color.svg"

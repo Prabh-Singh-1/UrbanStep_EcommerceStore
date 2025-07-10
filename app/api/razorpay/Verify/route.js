@@ -51,20 +51,31 @@ export async function POST(req) {
       return new Response(JSON.stringify({ success: false, error: 'Invalid signature' }), { status: 400 });
     }
 
+    console.log("Creating order with data:", {
+      name,
+      email,
+      phone,
+      orderid: order_id,
+      products,
+      address,
+      amount,
+      status: 'paid',
+    });
 
     const newOrder = await prisma.order.create({
       data: {
         name,
         email,
         phone: phone,
-        orderId: order_id,
+        orderid: order_id,
         products,
         address,
         amount,
+        status: 'paid',
       },
     });
 
-    console.log('products: ', products);
+
 
     // update AvalaibleQty of products
     for (const itemCode in products) {
@@ -91,9 +102,9 @@ export async function POST(req) {
       }
 
       await prisma.product.update({
-        where: { slug: itemCode }, 
+        where: { slug: itemCode },
         data: {
-          availableQty: {
+          availableqty: {
             decrement: qty,
           },
         },

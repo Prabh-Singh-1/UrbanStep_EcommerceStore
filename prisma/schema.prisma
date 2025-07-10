@@ -12,19 +12,19 @@ model Order {
   name      String
   email     String
   phone     String
-  orderid   String
+  orderid   String @unique
   products  Json
   address   String
   amount    Float
   status    String
-  createdat DateTime?
-  updatedat DateTime?
+  createdat DateTime? @default(now())
+  updatedat DateTime? @updatedAt
 }
 
 model Product {
   id           Int       @id @default(autoincrement())
   title        String
-  slug         String
+  slug         String    @unique
   desc         String
   img          String
   category     String
@@ -32,19 +32,19 @@ model Product {
   color        String?
   price        Float
   availableqty Int
-  createdat    DateTime?
-  updatedat    DateTime?
+  createdat    DateTime? @default(now())
+  updatedat    DateTime? @updatedAt
 }
 
 model User {
   id        Int       @id @default(autoincrement())
   name      String?
-  email     String
+  email     String @unique
   image     String?
   password  String?
   provider  String
-  createdat DateTime?
-  updatedat DateTime?
+  createdat DateTime? @default(now())
+  updatedat DateTime? @updatedAt
   phone     String?
   address   String?
 }

@@ -104,19 +104,19 @@ const Orders = () => {
                             <tbody className="divide-y divide-gray-200">
                                 {/* Sample row structure - replace with actual data */}
                                 {allOrders.map((order) => (
-                                    <tr key={order.orderId} className="hover:bg-gray-50 transition-colors">
+                                    <tr key={order.orderid} className="hover:bg-gray-50 transition-colors">
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-3">
                                                 <div className="p-2 bg-blue-50 rounded-lg">
                                                     <Package className="w-4 h-4 text-blue-600" />
                                                 </div>
-                                                <span className="font-medium text-gray-900">{order.orderId}</span>
+                                                <span className="font-medium text-gray-900">{order.orderid}</span>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-2 text-gray-700">
                                                 <Calendar className="w-4 h-4 text-gray-400" />
-                                                {new Date(order.createdAt).toLocaleDateString()}
+                                                {new Date(order.createdat).toLocaleDateString()}
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
@@ -138,7 +138,7 @@ const Orders = () => {
                                         <td className="px-6 py-4">
                                             <div className="flex items-center justify-center gap-2">
                                                 <button className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="View Details">
-                                                    <a href={`/Order?orderId=${order.orderId}`}>
+                                                    <a href={`/Order?orderId=${order.orderid}`}>
                                                     <Eye className="w-4 h-4" />
                                                     </a>
                                                 </button>

@@ -25,20 +25,36 @@ const Page = () => {
 
   useEffect(() => {
     async function fetchProduct() {
-      const res = await fetch(`/api/product?title=${encodeURIComponent(ProductName)}`)
+      const res = await fetch(`/api/product?title=${encodeURIComponent(ProductName)}`);
       const data = await res.json();
       const firstKey = Object.keys(data)[0];
       const productData = data[firstKey];
-      if (data) {
-        setProduct(productData);
 
+      if (productData) {
+        // Fetch all variants of this product
+        const variantRes = await fetch(`/api/getProductByTitle?title=${encodeURIComponent(productData.title)}`);
+        const variantData = await variantRes.json();
+
+        const colors = [...new Set(variantData.map(v => v.color))];
+        const sizes = [...new Set(variantData.map(v => v.size))];
+
+        setProduct({
+          ...productData,
+          color: colors,
+          size: sizes,
+        });
       } else {
         console.error('Product not found');
       }
     }
-    fetchProduct();
-  }, [ProductName])
 
+    fetchProduct();
+  }, [ProductName]);
+
+  useEffect(() => {
+
+    console.log('Product data: ', product);
+  }, [product])
 
   useEffect(() => {
     if (availableSizes.length) {
@@ -70,12 +86,25 @@ const Page = () => {
     console.log('Variants: ', variants);
 
     const filteredSizes = variants
-      .filter(v => v.color === productColor && v.availableQty > 0)
+      .filter(v => v.color === productColor && v.availableqty > 0)
       .map(v => v.size);
 
     const sortedSizes = [...filteredSizes].sort((a, b) => parseInt(a) - parseInt(b));
+    setAvailableSizes(sortedSizes);
+
+
+    if (!size || !sortedSizes.includes(size)) {
+      const newSize = sortedSizes[0] || '';
+      setsize(newSize);
+      //  Manually trigger variantQty update
+      const matchedVariant = variants.find(v => v.size === newSize && v.color === productColor);
+      setSelectedVariantQty(matchedVariant?.availableqty || 0);
+    }
 
     const variantImg = variants.find(v => v.color === productColor)?.img || '';
+    console.log("Available Sizes:", sortedSizes);
+    console.log("Current Size:", size);
+    console.log("Selected Color:", productColor);
     console.log('variantImg: ', variantImg);
 
     setAvailableSizes(sortedSizes);
@@ -89,8 +118,7 @@ const Page = () => {
     const matchedVariant = variants.find(
       v => v.size === size && v.color === productColor
     );
-
-    setSelectedVariantQty(matchedVariant?.availableQty || 0);
+    setSelectedVariantQty(matchedVariant?.availableqty || 0);
   }, [size, productColor, variants]);
 
   const saveCart = (mycart, cartDot, subtot) => {
@@ -104,10 +132,14 @@ const Page = () => {
     setsize(e.target.value)
   }
 
-  const handleColor = (e) => {
-    console.log('Selected color: ', e.target.value);
-    setproductColor(e.target.value)
-  }
+  const handleColor = (selectedColor) => {
+    console.log('Selected color: ', selectedColor);
+    setproductColor(selectedColor);
+  };
+
+  useEffect(() => {
+    console.log('Filtered Sizes based on', productColor, ':', availableSizes);
+  }, [availableSizes, productColor]);
 
   const addTocart = (itemCode, qty, price, name, size, variant, category) => {
 
@@ -197,10 +229,15 @@ const Page = () => {
                 <div className="flex">
                   <span className="mr-3">Color</span>
 
-                  {product.color.includes('White') && <button className="border-2 border-gray-300 rounded-full w-6 h-6 focus:ring-2 focus:ring-gray-300 focus:outline-none cursor-pointer" onClick={handleColor} value={"White"} ></button>}
-                  {product.color.includes('Blue') && <button className="border-2 focus:ring-2 focus:ring-gray-300 border-gray-300 ml-1 bg-blue-700 rounded-full w-6 h-6 focus:outline-none cursor-pointer" onClick={handleColor} value={"Blue"} ></button>}
-                  {product.color.includes('Red') && <button className="border-2 focus:ring-2 focus:ring-gray-300 border-gray-300 ml-1 bg-red-500 rounded-full w-6 h-6 focus:outline-none cursor-pointer" onClick={handleColor} value={"Red"} ></button>}
-                  {product.color.includes('Black') && <button className="border-2 focus:ring-2 focus:ring-gray-300 border-gray-300 ml-1 bg-black rounded-full w-6 h-6 focus:outline-none cursor-pointer" onClick={handleColor} value={"Black"} ></button>}
+                  {product.color.includes('White') && (<button className="border-2 border-gray-300 rounded-full w-6 h-6 focus:ring-2 focus:ring-gray-300 focus:outline-none cursor-pointer" onClick={() => handleColor("White")}  ></button>)}
+                  {product.color.includes('Blue') && (<button className="border-2 focus:ring-2 focus:ring-gray-300 border-gray-300 ml-1 bg-blue-700 rounded-full w-6 h-6 focus:outline-none cursor-pointer" onClick={() => handleColor("Blue")} value={"Blue"} ></button>)}
+                  {product.color.includes('Red') && (
+                    <button
+                      className="border-2 focus:ring-2 focus:ring-gray-300 border-gray-300 ml-1 bg-red-500 rounded-full w-6 h-6 focus:outline-none cursor-pointer"
+                      onClick={() => handleColor("Red")}
+                    ></button>
+                  )}
+                  {product.color.includes('Black') && (<button className="border-2 focus:ring-2 focus:ring-gray-300 border-gray-300 ml-1 bg-black rounded-full w-6 h-6 focus:outline-none cursor-pointer" onClick={() => handleColor("Black")} ></button>)}
                 </div>
                 <div className="flex ml-6 items-center">
                   <span className="mr-3">Size</span>
