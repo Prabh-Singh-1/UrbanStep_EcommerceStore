@@ -1,8 +1,9 @@
 "use client"
-import React,{useEffect, useState} from 'react'
+import React, { useEffect, useState } from 'react'
+import Loader from '@/app/Components/Loader/page.js'
 import Link from 'next/link'
 
-const Sports =  () => {
+const Sports = () => {
 
   const [products, setproducts] = useState({})
 
@@ -14,16 +15,18 @@ const Sports =  () => {
       const data = await res.json()
       setproducts(data)
       console.log(data)
-      
+
     }
     fetchProducts()
   }, [])
 
   useEffect(() => {
-  console.log('Products updated:', products);
+    console.log('Products updated:', products);
   }, [products]);
-  
 
+  if (!products) return <div className="text-center p-10">
+    <Loader />
+  </div>;
 
   return (
     <div>
@@ -52,7 +55,7 @@ const Sports =  () => {
                     {products[product].size.includes('10') && <span className='border border-gray-500 px-1 mx-1'>10</span>}
                   </div>
                   <div className='text-gray-500 mt-1.5 flex flex-row gap-1'>
-                   {products[product].color.includes('White') &&  <button className="border-2 border-gray-300 rounded-full w-6 h-6 focus:ring-2 focus:ring-gray-300 focus:outline-none cursor-pointer" value={"White"} ></button>}
+                    {products[product].color.includes('White') && <button className="border-2 border-gray-300 rounded-full w-6 h-6 focus:ring-2 focus:ring-gray-300 focus:outline-none cursor-pointer" value={"White"} ></button>}
                     {products[product].color.includes('blue') && <button className="border-2 border-gray-300 rounded-full w-6 h-6 focus:ring-2 focus:ring-gray-300 bg-blue-600 focus:outline-none cursor-pointer" value={"White"} ></button>}
                     {products[product].color.includes('red') && <button className="border-2 border-gray-300 rounded-full w-6 h-6 focus:ring-2 focus:ring-gray-300 bg-red-500 focus:outline-none cursor-pointer" value={"White"} ></button>}
                     {products[product].color.includes('black') && <button className="border-2 border-gray-300 rounded-full w-6 h-6 focus:ring-2 focus:ring-gray-300 bg-black focus:outline-none cursor-pointer" value={"White"} ></button>}

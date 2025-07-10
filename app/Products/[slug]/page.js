@@ -19,6 +19,7 @@ const Page = () => {
   const { cart, setcart } = useContext(CartContext);
   const { cartDot, setcartDot } = useContext(CartContext);
   const { subtotal, setsubtotal } = useContext(CartContext);
+  const [selectedVariantQty, setSelectedVariantQty] = useState(0);
 
   const [size, setsize] = useState('')
 
@@ -30,6 +31,7 @@ const Page = () => {
       const productData = data[firstKey];
       if (data) {
         setProduct(productData);
+
       } else {
         console.error('Product not found');
       }
@@ -37,10 +39,11 @@ const Page = () => {
     fetchProduct();
   }, [ProductName])
 
+
   useEffect(() => {
     if (availableSizes.length) {
       const newSize = availableSizes.includes(size) ? size : availableSizes[0];
-     handleSize({ target: { value: newSize } });
+      handleSize({ target: { value: newSize } });
     }
   }, [availableSizes]);
 
@@ -80,7 +83,15 @@ const Page = () => {
   }, [productColor, variants]);
 
 
+  useEffect(() => {
+    if (!size || !productColor || !variants.length) return;
 
+    const matchedVariant = variants.find(
+      v => v.size === size && v.color === productColor
+    );
+
+    setSelectedVariantQty(matchedVariant?.availableQty || 0);
+  }, [size, productColor, variants]);
 
   const saveCart = (mycart, cartDot, subtot) => {
     localStorage.setItem('cart', JSON.stringify(mycart));
@@ -168,7 +179,7 @@ const Page = () => {
 
   if (!product) return <div className="text-center p-10">
     <Loader />
-    </div>;
+  </div>;
   return (
     <>
       <section className="min-h-screen text-gray-600 body-font overflow-hidden">
@@ -208,9 +219,17 @@ const Page = () => {
                 </div>
               </div>
               <div className="flex gap-3">
-                {product.availableQty > 0 ? <span className="title-font font-medium text-2xl text-gray-900">₹{product.price}</span> : <span className="title-font font-medium text-2xl text-gray-900">Currently unavailable!</span>}
-                <button disabled={product.availableQty <= 0} onClick={() => { const baseSlug = slugify(product.title); const fullSlug = `${baseSlug}-${size}-${productColor.toLowerCase()}`; handleBuyNow(fullSlug, 1, product.price, product.title, size, productColor, product.category) }} className="flex  text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded">Buy Now</button>
-                <button disabled={product.availableQty <= 0} onClick={() => { const baseSlug = slugify(product.title); const fullSlug = `${baseSlug}-${size}-${productColor.toLowerCase()}`; addTocart(fullSlug, 1, product.price, product.title, size, productColor, product.category) }} className="flex justify-center items-center gap-1.5 text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded"><FaShoppingBag />Add to Cart</button>
+                {selectedVariantQty > 0 ? (
+                  <span className="title-font font-medium text-2xl text-gray-900">
+                    ₹{product.price}
+                  </span>
+                ) : (
+                  <span className="title-font font-medium text-2xl text-red-500">
+                    Currently unavailable!
+                  </span>
+                )}
+                <button disabled={selectedVariantQty <= 0} onClick={() => { const baseSlug = slugify(product.title); const fullSlug = `${baseSlug}-${size}-${productColor.toLowerCase()}`; handleBuyNow(fullSlug, 1, product.price, product.title, size, productColor, product.category) }} className="flex  text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded">Buy Now</button>
+                <button disabled={selectedVariantQty <= 0} onClick={() => { const baseSlug = slugify(product.title); const fullSlug = `${baseSlug}-${size}-${productColor.toLowerCase()}`; addTocart(fullSlug, 1, product.price, product.title, size, productColor, product.category) }} className="flex justify-center items-center gap-1.5 text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded"><FaShoppingBag />Add to Cart</button>
               </div>
             </div>
           </div>
