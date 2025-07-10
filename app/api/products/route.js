@@ -6,22 +6,31 @@ export async function GET(req) {
   const { searchParams } = new URL(req.url)
   const category = searchParams.get('category')
 
+
+  const result = await prisma.$queryRaw`SELECT current_database()`;
+  console.log("Connected DB:", result);
+  
+  console.log('Category:', category);
+
+
   const products = await prisma.product.findMany({
     where: category ? { category } : {},
   })
 
+  console.log("Fetched products:", products);
+
   const shoes = {}
 
   for (const item of products) {
+    console.log('Processing item:', item);
+
     if (!shoes[item.title]) {
-      // Initialize new product entry
       shoes[item.title] = {
         ...item,
         color: item.availableQty > 0 ? [item.color] : [],
         size: item.availableQty > 0 ? [item.size] : [],
       }
     } else {
-      // Add unique color/size if available
       if (item.availableQty > 0) {
         if (!shoes[item.title].color.includes(item.color)) {
           shoes[item.title].color.push(item.color)
@@ -33,11 +42,9 @@ export async function GET(req) {
     }
   }
 
-
-
+  console.log('Shoes Object:', shoes);
 
   return NextResponse.json(shoes, { status: 200 })
-
 }
 
 export async function POST(req) {
