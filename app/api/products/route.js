@@ -5,10 +5,6 @@ import { NextResponse } from 'next/server'
 export async function GET(req) {
   const { searchParams } = new URL(req.url)
   const category = searchParams.get('category')
-
-
-  const result = await prisma.$queryRaw`SELECT current_database()`;
-  console.log("Connected DB:", result);
   
   console.log('Category:', category);
 
