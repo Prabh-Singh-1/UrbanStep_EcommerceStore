@@ -7,7 +7,7 @@ export async function POST(request) {
   const { allProducts } = body;
 
   const razorpay = new Razorpay({
-    key_id: process.env.KEY_ID,
+    key_id: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
     key_secret: process.env.KEY_SECRET,
   });
 
