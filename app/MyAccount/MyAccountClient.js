@@ -7,39 +7,46 @@ import { useSearchParams, useRouter } from 'next/navigation';
 
 const MyAccount = () => {
     const { data: session, status } = useSession();
-    const router = useRouter(); 
+    const router = useRouter();
     const [activeTab, setActiveTab] = useState('profile');
-    const [isEditingProfile, setIsEditingProfile] = useState(false); 
+    const [isEditingProfile, setIsEditingProfile] = useState(false);
     const [isEditingAddress, setIsEditingAddress] = useState(false);
+    const [hasInitializedFormData, setHasInitializedFormData] = useState(false);
 
     const { userCred } = useContext(CartContext);
     const searchParams = useSearchParams();
-    const email = searchParams.get('email');
+    const [email, setEmail] = useState(null);
 
-  
+    useEffect(() => {
+        const paramEmail = searchParams.get('email');
+        setEmail(paramEmail);
+    }, [searchParams]);
+
+
     const [userData, setuserData] = useState(null);
 
-    // State for Profile form fields (mutable, used for editing)
+
     const [profileFormData, setProfileFormData] = useState({
         firstName: '',
         lastName: '',
         phone: '',
     });
 
-    // State for Address form fields (mutable, used for editing)
     const [addressFormData, setAddressFormData] = useState({
         streetAddress: '',
         city: '',
-        stateZip: '', 
+        stateZip: '',
     });
 
-   
+
     const [userAddressParts, setUserAddressParts] = useState([]);
 
-    
+
     useEffect(() => {
+        if (!email) return;
+
         const fetchUserDetails = async () => {
-           
+
             if (email && ((session && session.user) || (userCred && Object.keys(userCred).length > 0))) {
                 try {
                     const response = await fetch(`/api/updateUser?email=${email}`, {
@@ -50,30 +57,32 @@ const MyAccount = () => {
                     });
                     const data = await response.json();
 
-                    if (response.ok && data) { 
+                    if (response.ok && data) {
                         console.log("Fetched user data:", data);
-                        setuserData(data); 
+                        setuserData(data);
                     } else {
                         console.error('Failed to fetch user details:', data);
-                        setuserData(null); 
+                        setuserData(null);
                     }
                 } catch (error) {
                     console.error('Error fetching user details:', error);
-                    setuserData(null); 
+                    setuserData(null);
                 }
             } else if (!email) {
                 console.warn("Email parameter is missing from URL. Cannot fetch user details.");
-                
+
             }
         };
 
         fetchUserDetails();
-    }, [email, session, userCred]); 
+    }, [email]);
 
-   
     useEffect(() => {
-        if (userData) {
-            // Populate profile form data
+        setHasInitializedFormData(false); // reset flag when user changes
+    }, [email]);
+
+    useEffect(() => {
+        if (userData && !hasInitializedFormData) {
             const nameParts = userData.name ? userData.name.split(' ') : ['', ''];
             setProfileFormData({
                 firstName: nameParts[0] || '',
@@ -81,7 +90,6 @@ const MyAccount = () => {
                 phone: userData.phone || '',
             });
 
-            
             if (userData.address) {
                 const addressParts = userData.address.split("$$");
                 setAddressFormData({
@@ -89,38 +97,19 @@ const MyAccount = () => {
                     city: addressParts[1] ? addressParts[1].trim() : '',
                     stateZip: addressParts[2] ? addressParts[2].trim() : '',
                 });
-                setUserAddressParts(addressParts.map(part => part.trim())); 
+                setUserAddressParts(addressParts.map(part => part.trim()));
             } else {
                 setAddressFormData({ streetAddress: '', city: '', stateZip: '' });
                 setUserAddressParts([]);
             }
+
+            setHasInitializedFormData(true); // ✅ Set flag to true
         }
-     
-        if (!isEditingProfile && userData) {
-             const nameParts = userData.name ? userData.name.split(' ') : ['', ''];
-            setProfileFormData({
-                firstName: nameParts[0] || '',
-                lastName: nameParts[1] || '',
-                phone: userData.phone || '',
-            });
-        }
-        
-        if (!isEditingAddress && userData) {
-            if (userData.address) {
-                const addressParts = userData.address.split("$$");
-                setAddressFormData({
-                    streetAddress: addressParts[0] ? addressParts[0].trim() : '',
-                    city: addressParts[1] ? addressParts[1].trim() : '',
-                    stateZip: addressParts[2] ? addressParts[2].trim() : '',
-                });
-            } else {
-                setAddressFormData({ streetAddress: '', city: '', stateZip: '' });
-            }
-        }
-    }, [userData, isEditingProfile, isEditingAddress]); 
+    }, [userData, hasInitializedFormData]);
 
 
     const handleProfileInputChange = (e) => {
+
         const { id, value } = e.target;
         setProfileFormData(prevData => ({
             ...prevData,
@@ -128,7 +117,7 @@ const MyAccount = () => {
         }));
     };
 
-    
+
     const handleAddressInputChange = (e) => {
         const { id, value } = e.target;
         setAddressFormData(prevData => ({
@@ -137,46 +126,47 @@ const MyAccount = () => {
         }));
     };
 
-    
+
     const handleSaveProfileChanges = async () => {
         console.log("Saving profile changes:", profileFormData);
         try {
             const response = await fetch(`/api/updateUser?email=${email}`, {
-                method: 'POST', 
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    name: `${profileFormData.firstName} ${profileFormData.lastName}`.trim(), 
+                    name: `${profileFormData.firstName} ${profileFormData.lastName}`.trim(),
                     phone: profileFormData.phone,
+                    email: session ? session.user.email : userCred.email
                 }),
             });
             const result = await response.json();
             if (response.ok) {
                 console.log('Profile update successful:', result);
-                
+
                 setuserData(prevUserData => ({
                     ...prevUserData,
                     name: `${profileFormData.firstName} ${profileFormData.lastName}`.trim(),
                     phone: profileFormData.phone,
                 }));
-                setIsEditingProfile(false); 
+                setIsEditingProfile(false);
             } else {
                 console.error('Failed to update profile details:', result);
-            
+
             }
         } catch (error) {
             console.error('Error updating profile details:', error);
-            
+
         }
     };
 
-    
+
     const handleSaveAddressChanges = async () => {
         console.log("Saving address changes:", addressFormData);
         try {
-            const response = await fetch(`/api/updateUser?email=${email}`, { 
-                method: 'POST', // Or PATCH/PUT
+            const response = await fetch(`/api/updateUser?email=${email}`, {
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -187,26 +177,24 @@ const MyAccount = () => {
             const result = await response.json();
             if (response.ok) {
                 console.log('Address update successful:', result);
-                // Update the main userData state to reflect changes and stop editing mode
+
                 setuserData(prevUserData => ({
                     ...prevUserData,
                     address: `${addressFormData.streetAddress}$$${addressFormData.city}$$${addressFormData.stateZip}`,
                 }));
-                setIsEditingAddress(false); // Exit editing mode
+                setIsEditingAddress(false);
             } else {
                 console.error('Failed to update address:', result);
-                // Handle error: show message to user
+
             }
         } catch (error) {
             console.error('Error updating address:', error);
-            // Handle network error
+
         }
     };
 
-    // --- Handle Cancel Editing for Profile ---
     const handleCancelProfileEdit = () => {
         setIsEditingProfile(false);
-        // Reset form data to the original userData when cancelling
         if (userData) {
             const nameParts = userData.name ? userData.name.split(' ') : ['', ''];
             setProfileFormData({
@@ -217,10 +205,10 @@ const MyAccount = () => {
         }
     };
 
-    // --- Handle Cancel Editing for Address ---
+
     const handleCancelAddressEdit = () => {
         setIsEditingAddress(false);
-        // Reset form data to the original userData when cancelling
+
         if (userData) {
             if (userData.address) {
                 const addressParts = userData.address.split("$$");
@@ -307,7 +295,7 @@ const MyAccount = () => {
                         value={profileFormData.phone}
                         id="phone"
                         type="tel"
-                        disabled={!isEditingProfile} // Use isEditingProfile
+                        disabled={!isEditingProfile}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
                         placeholder="Enter your phone number"
                     />
@@ -317,7 +305,7 @@ const MyAccount = () => {
             {isEditingProfile && (
                 <div className="flex gap-3">
                     <button
-                        onClick={handleSaveProfileChanges} // Call the save handler for profile
+                        onClick={handleSaveProfileChanges}
                         className="flex items-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
                     >
                         <Save className="w-4 h-4" />
@@ -357,11 +345,11 @@ const MyAccount = () => {
                             <h3 className="font-semibold text-gray-900">Default Address</h3>
                             <span className="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-full">Primary</span>
                         </div>
-                        {/* Edit button moved to the main section header */}
+
                     </div>
 
                     {!isEditingAddress ? (
-                        // Display Mode
+
                         userAddressParts.length > 0 ? (
                             userAddressParts.map((item, idx) => (
                                 <div key={idx} className="text-gray-600 space-y-1">
@@ -372,7 +360,7 @@ const MyAccount = () => {
                             <p className="text-gray-500">No address found.</p>
                         )
                     ) : (
-                        // Edit Mode
+
                         <div className="grid grid-cols-1 gap-4">
                             <div>
                                 <label htmlFor="streetAddress" className="block text-sm font-medium text-gray-700 mb-2">Street Address</label>
@@ -543,8 +531,8 @@ const MyAccount = () => {
                                         key={tab.id}
                                         onClick={() => setActiveTab(tab.id)}
                                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all duration-200 ${activeTab === tab.id
-                                                ? 'bg-blue-500 text-white shadow-md'
-                                                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                                            ? 'bg-blue-500 text-white shadow-md'
+                                            : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
                                             }`}
                                     >
                                         <Icon className="w-5 h-5" />

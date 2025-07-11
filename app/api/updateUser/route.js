@@ -5,7 +5,7 @@ export async function GET(req) {
     try {
         const { searchParams } = new URL(req.url);
         const userEmail = searchParams.get("email");
-        
+
         console.log('UserEmail: ', userEmail);
 
         if (!userEmail) {
@@ -19,13 +19,13 @@ export async function GET(req) {
                 email: true,
                 phone: true,
                 image: true,
-                address: true, 
+                address: true,
             },
         });
         if (!user) {
             return NextResponse.json({ error: "User not found" }, { status: 404 });
         }
-        return NextResponse.json(user,{ status: 200 });
+        return NextResponse.json(user, { status: 200 });
     }
     catch (error) {
         console.error("GET /api/updateUser error:", error);
@@ -35,20 +35,23 @@ export async function GET(req) {
 
 export async function POST(req) {
     try {
+        const { searchParams } = new URL(req.url);
+        const userEmail = searchParams.get("email");
         const body = await req.json();
-        const { userId, name, email, phone, image } = body;
+        console.log('Request Body: ', body);
+        // const { userId, name, email, phone, image } = body;
 
-        if (!userId) {
+        if (!body.email) {
             return NextResponse.json({ error: "User ID is required" }, { status: 400 });
         }
 
         const updatedUser = await prisma.user.update({
-            where: { id: userId },
+            where: { email: userEmail },
             data: {
-                name: name || undefined,
-                email: email || undefined,
-                phone: phone ? parseInt(phone) : undefined,
-                image: image || undefined,
+                name: body.name || undefined,
+                email: body.email || undefined,
+                phone: body.phone || null,
+                address: body.address || null
             },
         });
 

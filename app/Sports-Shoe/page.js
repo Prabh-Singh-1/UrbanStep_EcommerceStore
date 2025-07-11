@@ -1,11 +1,13 @@
 "use client"
 import React, { useEffect, useState } from 'react'
-import Loader from '@/app/Components/Loader/page.js'
+import ProductSkeleton from '../Components/ProductSkeleton/page'
 import Link from 'next/link'
+import Image from 'next/image'
 
 const Sports = () => {
 
   const [products, setproducts] = useState({})
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -14,6 +16,7 @@ const Sports = () => {
       })
       const data = await res.json()
       setproducts(data)
+      setLoading(false);
       console.log(data)
 
     }
@@ -24,10 +27,20 @@ const Sports = () => {
     console.log('Products updated:', products);
   }, [products]);
 
-  if (!products) return <div className="text-center p-10">
-    <Loader />
-  </div>;
-
+  if (loading) {
+    return <div className="text-center flex lg:flex-row flex-col p-10 lg:gap-12 gap-5">
+      <ProductSkeleton />
+      <ProductSkeleton />
+      <ProductSkeleton />
+      <ProductSkeleton />
+    </div>;
+  }
+  if(!products || Object.keys(products).length === 0) {
+    return <div className="text-center p-10 flex flex-col items-center justify-center">
+      <h2 className="text-xl font-semibold">No Products Found!</h2>
+      <video src="/not-found.mp4" autoPlay loop muted/>
+    </div>;
+  }
   return (
     <div>
       <section className="text-gray-600 body-font">
@@ -37,7 +50,9 @@ const Sports = () => {
             {Object.keys(products).map(product => (
               <div key={products[product].id} className="lg:w-1/4 md:w-1/2 p-4 w-full shadow-xl">
                 <Link href={`/Products/${products[product].title}`} className="relative h-48 flex justify-center items-center rounded overflow-hidden bg-white">
-                  <img
+                  <Image
+                    width={300}
+                    height={300}
                     alt="ecommerce"
                     src={products[product].img}
                     className="w-full h-full object-contain p-4"

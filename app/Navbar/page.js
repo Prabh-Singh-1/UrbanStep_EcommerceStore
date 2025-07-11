@@ -190,7 +190,7 @@ const Navbar = () => {
                                 <li><Link href="/" className="text-sm lg:text-lg font-medium text-gray-900 hover:text-gray-700">Home</Link></li>
                                 <Link href="/Sports-Shoe" className="text-sm lg:text-lg font-medium text-gray-900 hover:text-gray-700"><li>Sports Shoes</li></Link>
                                 <li><Link href="/Loafers" className="text-sm lg:text-lg font-medium text-gray-900 hover:text-gray-700">Loafers</Link></li>
-                                <li><Link href="/Snickers" className="text-sm lg:text-lg font-medium text-gray-900 hover:text-gray-700">Snickers</Link></li>
+                                <li><Link href="/Snickers" className="text-sm lg:text-lg font-medium text-gray-900 hover:text-gray-700">Sneaker</Link></li>
                                 <li><Link href="/Boots" className="text-sm lg:text-lg font-medium text-gray-900 hover:text-gray-700">Boots</Link></li>
                             </ul>
                         </div>
@@ -226,7 +226,7 @@ const Navbar = () => {
                                     </div>
                                     <ul className="py-2" aria-labelledby="user-menu-button">
                                         <li>
-                                            <a href={`/MyAccount?email=${session? session.user.email: userCred.email}`} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">My Account</a>
+                                            <a href={`/MyAccount?email=${encodeURIComponent(session? session.user.email: userCred.email)}`} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">My Account</a>
                                         </li>
                                         <li>
                                             {session && <a href={`/Orders?email=${encodeURIComponent(session.user?.email)}`} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">My Orders</a>}
@@ -255,7 +255,7 @@ const Navbar = () => {
                                     </div>
                                     <ul className="py-2" aria-labelledby="user-menu-button">
                                         <li>
-                                            <a href={`/MyAccount?email=${session? session.user.email: userCred.email}`} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">My Account</a>
+                                            <a href={`/MyAccount?email=${encodeURIComponent(userCred.email)}`} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">My Account</a>
                                         </li>
                                         <li>
                                             <a href={`/Orders?email=${encodeURIComponent(userCred.email)}`} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">My Orders</a>
@@ -363,7 +363,7 @@ const Navbar = () => {
                         <ul className="text-gray-900 text-sm font-medium space-y-3">
                             <li><Link href="/" className="hover:text-gray-700">Home</Link></li>
                             <li><Link href="/Sports-Shoe" className="hover:text-gray-700">Sports Shoes</Link></li>
-                            <li><Link href="/Snickers" className="hover:text-gray-700">Snickers</Link></li>
+                            <li><Link href="/Snickers" className="hover:text-gray-700">Sneaker</Link></li>
                             <li><Link href="/Loafers" className="hover:text-gray-700">Loafers</Link></li>
                             <li><Link href="/Boots" className="hover:text-gray-700">Boots</Link></li>
                         </ul>
