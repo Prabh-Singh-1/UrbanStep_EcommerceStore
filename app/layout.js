@@ -6,7 +6,8 @@ import Footer from "./Footer/page";
 import { CartProvider } from "./cartContext";
 import SessionWrapper from "../component/SessionWrapper";
 import TopLoader from "./Components/TopLoader";
-
+import { Analytics } from '@vercel/analytics/next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,13 +28,15 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
 
-  return (  
+  return (
     <html lang="en">
       <SessionWrapper>
-         
+
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-x-hidden`}
         >
+          <Analytics />
+          <SpeedInsights />
           <TopLoader />
           <CartProvider>
             <Navbar />

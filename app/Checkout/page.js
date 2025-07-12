@@ -403,7 +403,7 @@ const Checkout = () => {
 
         <button
           type="sumbit"
-          className="bg-[#1f5ec6] w-sm  text-white px-6 py-3 rounded-lg cursor-pointer"
+          className="bg-[#1f5ec6] lg:w-sm w-auto text-white px-6 py-3 rounded-lg cursor-pointer"
         >
           Save Delivery Details
         </button>

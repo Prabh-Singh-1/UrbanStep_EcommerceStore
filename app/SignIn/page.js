@@ -83,24 +83,32 @@ const SignIn = () => {
         <div className="w-full max-w-md">
           <form onSubmit={fetchUser} className="space-y-4" >
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Enter your Email
-              </label>
-              <div className="flex gap-2">
-                <input
-                  type="email"
-                  placeholder="enter your email"
-                  className="w-1/3 px-4 py-2 mt-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                  value={email}
-                  onChange={(e) => setemail(e.target.value)}
-                />
-                <input
-                  type="text"
-                  placeholder="Enter your password"
-                  className="w-2/3 px-4 py-2 mt-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                  value={password}
-                  onChange={(e) => setpassword(e.target.value)}
-                />
+
+              <div className="flex lg:flex-row flex-col gap-2">
+                <div className='lg:w-2/3 w-full'>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Enter your Email
+                  </label>
+                  <input
+                    type="email"
+                    placeholder="enter your email"
+                    className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    value={email}
+                    onChange={(e) => setemail(e.target.value)}
+                  />
+                </div>
+                <div className='lg:w-1/3 w-full'>
+                   <label className="block text-sm font-medium text-gray-700">
+                    Enter your Email
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Password"
+                    className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    value={password}
+                    onChange={(e) => setpassword(e.target.value)}
+                  />
+                </div>
               </div>
             </div>
 
@@ -117,8 +125,8 @@ const SignIn = () => {
               className="cursor-pointer flex items-center justify-center gap-2 border w-full py-2 rounded-md hover:bg-gray-100 transition"
             >
               <Image
-              height={300}
-              width={300}
+                height={300}
+                width={300}
                 src="https://www.svgrepo.com/show/475656/google-color.svg"
                 alt="Google"
                 className="w-5 h-5"
@@ -157,8 +165,8 @@ const SignIn = () => {
 
       <div className="hidden md:flex justify-center items-center w-1/2 bg-blue-50">
         <Image
-        height={200}
-        width={200}
+          height={200}
+          width={200}
           src="/images/LoginDoodle.svg"
           alt="Login Illustration"
           className="w-3/4 h-auto"

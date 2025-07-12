@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 'use client'
 
 import React, { useContext, useState, useEffect } from 'react'
@@ -7,6 +6,7 @@ import { FaShoppingBag } from "react-icons/fa";
 import { CartContext } from '../../cartContext.js';
 import Loader from '@/app/Components/Loader/page.js';
 import { redirect } from 'next/navigation';
+import Image from 'next/image.js';
 
 
 const Page = () => {
@@ -15,6 +15,7 @@ const Page = () => {
   const [product, setProduct] = useState(null);
   const [variants, setVariants] = useState([]);
   const [availableSizes, setAvailableSizes] = useState([]);
+  const [availableColors, setAvailableColors] = useState([]);
   const [productImage, setProductImage] = useState('');
   const { cart, setcart } = useContext(CartContext);
   const { cartDot, setcartDot } = useContext(CartContext);
@@ -83,8 +84,10 @@ const Page = () => {
 
   useEffect(() => {
     if (!variants.length || !productColor) return;
+
     console.log('Variants: ', variants);
 
+    // Filter sizes for selected color
     const filteredSizes = variants
       .filter(v => v.color === productColor && v.availableqty > 0)
       .map(v => v.size);
@@ -92,24 +95,29 @@ const Page = () => {
     const sortedSizes = [...filteredSizes].sort((a, b) => parseInt(a) - parseInt(b));
     setAvailableSizes(sortedSizes);
 
+    // Filter available colors
+    const filteredColors = [
+      ...new Set(
+        variants
+          .filter(v => v.availableqty > 0)
+          .map(v => v.color)
+      ),
+    ];
+    setAvailableColors(filteredColors);
 
+    // Auto-select size
     if (!size || !sortedSizes.includes(size)) {
       const newSize = sortedSizes[0] || '';
       setsize(newSize);
-      //  Manually trigger variantQty update
+
       const matchedVariant = variants.find(v => v.size === newSize && v.color === productColor);
       setSelectedVariantQty(matchedVariant?.availableqty || 0);
     }
 
     const variantImg = variants.find(v => v.color === productColor)?.img || '';
-    console.log("Available Sizes:", sortedSizes);
-    console.log("Current Size:", size);
-    console.log("Selected Color:", productColor);
-    console.log('variantImg: ', variantImg);
-
-    setAvailableSizes(sortedSizes);
     setProductImage(variantImg);
-  }, [productColor, variants]);
+
+  }, [productColor, variants, size]);
 
 
   useEffect(() => {
@@ -217,7 +225,7 @@ const Page = () => {
       <section className="min-h-screen text-gray-600 body-font overflow-hidden">
         <div className="container px-5 py-4 mx-auto">
           <div className="lg:w-4/5 mx-auto justify-center items-center flex flex-wrap">
-            <img alt="ecommerce" className="lg:w-1/3 w-full lg:h-auto h-full p-6 object-contain object-center rounded" src={productImage || product.img} />
+            <Image height={300} width={600} alt="ecommerce" className="lg:w-1/3 w-full lg:h-auto h-full p-6 object-contain object-center rounded" src={productImage || product.img} />
             <div className="lg:w-1/2 object-center w-full lg:pl-10 lg:py-6 mt-6 lg:mt-0">
               <h2 className="text-sm title-font text-gray-500 tracking-widest">{product.category}</h2>
               <h1 className="text-gray-900 text-3xl title-font font-medium mb-1">{product.title}</h1>
@@ -229,15 +237,22 @@ const Page = () => {
                 <div className="flex">
                   <span className="mr-3">Color</span>
 
-                  {product.color.includes('White') && (<button className="border-2 border-gray-300 rounded-full w-6 h-6 focus:ring-2 focus:ring-gray-300 focus:outline-none cursor-pointer" onClick={() => handleColor("White")}  ></button>)}
-                  {product.color.includes('Blue') && (<button className="border-2 focus:ring-2 focus:ring-gray-300 border-gray-300 ml-1 bg-blue-700 rounded-full w-6 h-6 focus:outline-none cursor-pointer" onClick={() => handleColor("Blue")} value={"Blue"} ></button>)}
-                  {product.color.includes('Red') && (
+                  {availableColors.map((clr, idx) => (
                     <button
-                      className="border-2 focus:ring-2 focus:ring-gray-300 border-gray-300 ml-1 bg-red-500 rounded-full w-6 h-6 focus:outline-none cursor-pointer"
-                      onClick={() => handleColor("Red")}
+                      key={idx}
+                      className={`border-2 ml-1 rounded-full w-6 h-6 focus:outline-none cursor-pointer
+                                    ${productColor === clr ? `ring-2 ring-${clr}-500` : ''}
+                                    ${clr === 'White' ? 'bg-white border-gray-300' :
+                          clr === 'White'? 'bg-white':
+                          clr === 'Blue' ? 'bg-blue-700 border-gray-300' :
+                            clr === 'Red' ? 'bg-red-500 border-gray-300' :
+                              clr === 'Black' ? 'bg-black border-gray-300' :
+                                'bg-gray-200 border-gray-300'}`
+                      }
+                      onClick={() => handleColor(clr)}
+                      title={clr}
                     ></button>
-                  )}
-                  {product.color.includes('Black') && (<button className="border-2 focus:ring-2 focus:ring-gray-300 border-gray-300 ml-1 bg-black rounded-full w-6 h-6 focus:outline-none cursor-pointer" onClick={() => handleColor("Black")} ></button>)}
+                  ))}
                 </div>
                 <div className="flex ml-6 items-center">
                   <span className="mr-3">Size</span>
