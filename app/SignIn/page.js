@@ -9,6 +9,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, toast } from 'react-toastify';
 import { jwtDecode } from "jwt-decode";
 import Cookies from 'js-cookie';
+import Image from 'next/image';
 
 const SignIn = () => {
 
@@ -115,7 +116,9 @@ const SignIn = () => {
               onClick={() => signIn("google", { callbackUrl: "/" })}
               className="cursor-pointer flex items-center justify-center gap-2 border w-full py-2 rounded-md hover:bg-gray-100 transition"
             >
-              <img
+              <Image
+              height={300}
+              width={300}
                 src="https://www.svgrepo.com/show/475656/google-color.svg"
                 alt="Google"
                 className="w-5 h-5"
@@ -153,7 +156,9 @@ const SignIn = () => {
       </div>
 
       <div className="hidden md:flex justify-center items-center w-1/2 bg-blue-50">
-        <img
+        <Image
+        height={200}
+        width={200}
           src="/images/LoginDoodle.svg"
           alt="Login Illustration"
           className="w-3/4 h-auto"

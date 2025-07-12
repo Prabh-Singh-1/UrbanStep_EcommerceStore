@@ -39,7 +39,7 @@ export async function POST(req) {
         const userEmail = searchParams.get("email");
         const body = await req.json();
         console.log('Request Body: ', body);
-        // const { userId, name, email, phone, image } = body;
+      
 
         if (!body.email) {
             return NextResponse.json({ error: "User ID is required" }, { status: 400 });
