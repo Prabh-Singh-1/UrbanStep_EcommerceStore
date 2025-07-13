@@ -11,12 +11,8 @@ const MyAccountPage = () => {
     const { data: session, status } = useSession();
     const { userCred } = useContext(CartContext);
     const [activeTab, setActiveTab] = useState('profile');
-    const [isEditing, setIsEditing] = useState(false);
     const [userEmail, setuserEmail] = useState(null);
     const [userData, setuserData] = useState(null);
-    const [phone, setphone] = useState('');
-    const [fname, setfname] = useState('');
-    const [lname, setlname] = useState('');
     const [isEditingProfile, setIsEditingProfile] = useState(false);
     const [isEditingAddress, setIsEditingAddress] = useState(false);
     const [profileFormData, setProfileFormData] = useState({
@@ -212,7 +208,7 @@ const MyAccountPage = () => {
                     console.log('Address updated successful:', result);
                     toast.success('Address updated successful!', {
                         position: "top-right",
-                        autoClose: 5000,
+                        autoClose: 2500,
                         hideProgressBar: false,
                         closeOnClick: false,
                         pauseOnHover: true,
@@ -442,7 +438,7 @@ const MyAccountPage = () => {
                                     <div className="flex gap-3">
                                         <button
                                             onClick={handleSaveProfileChanges}
-                                            className="flex items-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                                            className="cursor-pointer flex items-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
                                         >
                                             <Save className="w-4 h-4" />
                                             Save Changes
@@ -536,7 +532,7 @@ const MyAccountPage = () => {
                                                         onClick={handleSaveAddressChanges}
                                                         className="flex items-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
                                                     >
-                                                        <Save className="w-4 h-4" />
+                                                        <Save className="cursor-pointer w-4 h-4" />
                                                         Save Address
                                                     </button>
 
