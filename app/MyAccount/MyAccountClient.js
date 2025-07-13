@@ -203,37 +203,36 @@ const MyAccountPage = () => {
             if (result.error) {
                 toast.error(`${data.error}, Please try again Later or check you connection.`)
             }
-            if (result.status)
-                if (response.ok) {
-                    console.log('Address updated successful:', result);
-                    toast.success('Address updated successful!', {
-                        position: "top-right",
-                        autoClose: 2500,
-                        hideProgressBar: false,
-                        closeOnClick: false,
-                        pauseOnHover: true,
-                        draggable: true,
-                        progress: undefined,
+            if (response.ok) {
+                console.log('Address updated successful:', result);
+                toast.success('Address updated successful!', {
+                    position: "top-right",
+                    autoClose: 2500,
+                    hideProgressBar: false,
+                    closeOnClick: false,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
 
-                    });
-                    setuserData(prevUserData => ({
-                        ...prevUserData,
-                        address: `${addressFormData.streetAddress}$$${addressFormData.city}$$${addressFormData.stateZip}`,
-                    }));
-                    setIsEditingAddress(false);
-                } else {
-                    console.error('Failed to update address:', result);
-                    toast.error('Failed to updated address!', {
-                        position: "top-right",
-                        autoClose: 5000,
-                        hideProgressBar: false,
-                        closeOnClick: false,
-                        pauseOnHover: true,
-                        draggable: true,
-                        progress: undefined,
+                });
+                setuserData(prevUserData => ({
+                    ...prevUserData,
+                    address: `${addressFormData.streetAddress}$$${addressFormData.city}$$${addressFormData.stateZip}`,
+                }));
+                setIsEditingAddress(false);
+            } else {
+                console.error('Failed to update address:', result);
+                toast.error('Failed to updated address!', {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: false,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
 
-                    });
-                }
+                });
+            }
         } catch (error) {
             console.error('Error updating address:', error);
             toast.error(`${data.error}, Please try again Later or check you connection.`)
@@ -281,18 +280,18 @@ const MyAccountPage = () => {
     if (status === "loading" || !userData) {
         return (
             <div className='mx-5 my-8 min-h-screen'>
-                 <ToastContainer
-                position="top-right"
-                autoClose={5000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick={false}
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
+                <ToastContainer
+                    position="top-right"
+                    autoClose={5000}
+                    hideProgressBar={false}
+                    newestOnTop={false}
+                    closeOnClick={false}
+                    rtl={false}
+                    pauseOnFocusLoss
+                    draggable
+                    pauseOnHover
 
-            />
+                />
                 <h1 className='text-2xl font-bold text-center my-5'>My Account</h1>
                 <div className='text-center text-lg font-semibold'>Loading user details...</div>
             </div>
