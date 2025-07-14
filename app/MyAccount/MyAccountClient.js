@@ -290,7 +290,6 @@ const MyAccountPage = () => {
                     pauseOnFocusLoss
                     draggable
                     pauseOnHover
-
                 />
                 <h1 className='text-2xl font-bold text-center my-5'>My Account</h1>
                 <div className='text-center text-lg font-semibold'>Loading user details...</div>

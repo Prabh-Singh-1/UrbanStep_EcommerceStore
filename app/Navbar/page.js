@@ -170,7 +170,7 @@ const Navbar = () => {
         timeoutRef.current = setTimeout(() => {
             setcartClick(false)
             setMenuClick(false)
-        }, 1000);
+        }, 500);
     };
     return (
         <>

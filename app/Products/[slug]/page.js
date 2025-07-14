@@ -5,8 +5,8 @@ import { useParams } from 'next/navigation';
 import { FaShoppingBag } from "react-icons/fa";
 import { CartContext } from '../../cartContext.js';
 import Loader from '@/app/Components/Loader/page.js';
-import { redirect } from 'next/navigation';
 import Image from 'next/image.js';
+import { useRouter } from 'next/navigation';
 
 
 const Page = () => {
@@ -21,6 +21,7 @@ const Page = () => {
   const { cartDot, setcartDot } = useContext(CartContext);
   const { subtotal, setsubtotal } = useContext(CartContext);
   const [selectedVariantQty, setSelectedVariantQty] = useState(0);
+  const router = useRouter();
 
   const [size, setsize] = useState('')
 
@@ -154,21 +155,17 @@ const Page = () => {
     let myCart = { ...cart };
     const numericQty = parseInt(qty);
     const numericPrice = parseFloat(price);
-
     let itemFound = false;
     let addedPrice = numericPrice * numericQty;
 
     for (const code in myCart) {
       const item = myCart[code];
-
       if (
         item.name === name &&
         item.size === size &&
         item.variant === variant &&
-        item.unitPrice === numericPrice &&
-        item.slug === itemCode
+        item.unitPrice === numericPrice
       ) {
-
         item.qty += numericQty;
         item.price = item.unitPrice * item.qty;
         addedPrice = numericPrice * numericQty;
@@ -179,7 +176,6 @@ const Page = () => {
 
 
     if (!itemFound) {
-
       const newCode = itemCode;
       myCart[newCode] = {
         qty: numericQty,
@@ -205,7 +201,7 @@ const Page = () => {
   const handleBuyNow = (itemcode, qty, price, name, size, variant, category) => {
 
     addTocart(itemcode, qty, price, name, size, variant, category)
-    redirect('/Checkout');
+    router.push('/Checkout');
   }
 
   const slugify = str =>
@@ -243,11 +239,11 @@ const Page = () => {
                       className={`border-2 ml-1 rounded-full w-6 h-6 focus:outline-none cursor-pointer
                                     ${productColor === clr ? `ring-2 ring-${clr}-500` : ''}
                                     ${clr === 'White' ? 'bg-white border-gray-300' :
-                          clr === 'White'? 'bg-white':
-                          clr === 'Blue' ? 'bg-blue-700 border-gray-300' :
-                            clr === 'Red' ? 'bg-red-500 border-gray-300' :
-                              clr === 'Black' ? 'bg-black border-gray-300' :
-                                'bg-gray-200 border-gray-300'}`
+                          clr === 'White' ? 'bg-white' :
+                            clr === 'Blue' ? 'bg-blue-700 border-gray-300' :
+                              clr === 'Red' ? 'bg-red-500 border-gray-300' :
+                                clr === 'Black' ? 'bg-black border-gray-300' :
+                                  'bg-gray-200 border-gray-300'}`
                       }
                       onClick={() => handleColor(clr)}
                       title={clr}
